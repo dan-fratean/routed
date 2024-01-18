@@ -29,7 +29,7 @@ function display_template($template, $data = array(), $display = true) {
 //display functions
 function display_system($id, $data, $display = true) {
 	display_template('system_display', array(
-		'{{SYSTEM_NAME}}' => $id,
+		'{{SYSTEM_NAME}}' => ucwords($id),
 		'{{SYSTEM_SIGS}}' => $data		
 	));
 }
@@ -42,7 +42,7 @@ function display_add_form() {
 function parse_data($input) {
 	$result = display_template('system_before', array(), false);
 
-	asort($input);
+	ksort($input);
 	foreach ($input as $id => $data) {
 		$group = $data[2];
 		$time = $data[5];
@@ -54,8 +54,8 @@ function parse_data($input) {
 		$diff = $end_time->diff($start_time);
 
 		$group = str_replace(
-			array('Combat Site', 'Ore Site', 'Wormhole'),
-			array('cmb', 'ore', 'wrh'),
+			array('Combat Site', 'Ore Site', 'Wormhole', 'Data Site', 'Gas Site', 'Relic Site'),
+			array('cmb', 'ore', 'wrh', 'dat', 'gas', 'rel'),
 			$group
 		);
 		if (empty($group)) {
@@ -72,6 +72,9 @@ function parse_data($input) {
 				break;
 			case 'gas':
 				$css = 'group_gas';
+				break;
+			case 'wrh':
+				$css = 'group_wormhole';
 				break;
 			default:
 				$css = '';
@@ -99,7 +102,7 @@ if (!$data) {
 $post_data = array();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	if ($_POST['action'] === 'add') {
-		$system_name = htmlspecialchars($_POST['system_name']);
+		$system_name = strtolower(htmlspecialchars($_POST['system_name']));
 		$system_sigs = htmlspecialchars($_POST['system_sigs']);
 
 		$post_data = array($system_name, array(
@@ -108,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		));
 	}
 	if ($_POST['action'] === 'remove') {
-		$system_name = htmlspecialchars($_POST['system_name']);
+		$system_name = strtolower(htmlspecialchars($_POST['system_name']));
 		$data[$system_name]['display'] = false;
 	}
 }
@@ -158,6 +161,7 @@ write_data($data);
 
 display_template('header');
 display_template('system_list_before');
+ksort($data);
 foreach ($data as $id => $system_data) {
 	if ($system_data['display']) {
 		display_system($id, parse_data($system_data['raw_data']));

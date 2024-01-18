@@ -1,36 +1,65 @@
 <html>
 	<head>
 		<style>
-body {
-	background-color: #46728299;
-	font-family: monospace;
-	font-size: 1em;
-}
+			body {
+				margin: 0;
+				position: relative;
+				font-family: monospace;
+				font-size: 1em;
+			}
 
-td {
-	vertical-align:top
-}
+			body:before {
+				background: url(bg.jpg) no-repeat center / cover;
+				background-attachment: fixed;
+				content: '';
+				position: absolute;
+				left: 0; right: 0; top: 0; bottom: 0;
+				z-index: -1;
+				opacity: 0.3;
+			}
 
-.system_list {
-	min-width:1400px;
-	overflow-y: hidden;
-	overflow-x: auto;
-}
+			.container {
+				position: relative;
+			}
 
-.system_name {
-	color: #000099;
-}
+			td {
+				vertical-align:top
+			}
 
-.group_besieged {
-	color: #990000;
-	font-weight: bold;
-}
+			.system_name {
+				color: #000099;
+			}
 
-.group_gas {
-	color: #009900;
-	font-weight: bold;
-}
+			.group_besieged {
+				color: #990000;
+				font-weight: bold;
+			}
 
+			.group_gas {
+				color: #009900;
+				font-weight: bold;
+			}
+
+			.group_wormhole {
+				color: #997700;
+				font-weight: bold;
+			}
+
+			.system-list-wrapper {
+				width: 100%;
+				overflow-x: auto;
+			}
+
+			.system_list {
+				display:flex
+			}
+
+			#system_list >div {
+				width: 150px;
+				flex-shrink: 0;
+			}
 		</style>
+		<title>EVE Online - Routed</title>
 	</head>
 	<body>
+		<div class="container">
