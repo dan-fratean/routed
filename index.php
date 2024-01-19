@@ -90,6 +90,12 @@ function parse_data($input)
                 break;
         }
 
+        $details =  'Type:&nbsp;&nbsp;&nbsp;'.$data[1]."\n";
+        $details .= 'Group:&nbsp;&nbsp;'.$data[2]."\n";
+        $details .= 'Name:&nbsp;&nbsp;&nbsp;'.$data[3]."\n";
+        $details .= 'Signal:&nbsp;'.$data[4]."\n";
+        $details .= 'Date:&nbsp;&nbsp;&nbsp;'.date("Y-m-d H:i:s", $data[5])."\n";
+
         $result .= display_template(
             'system_row',
             array(
@@ -97,6 +103,7 @@ function parse_data($input)
             '{{SIG_GROUP}}' => $group,
             '{{SIG_SCAN_AGE}}' => ($diff->format('%H:%I:%S')),
             '{{SIG_GROUP_CLASS}}' => $css,
+            '{{SIG_DETAILS}}' => $details,
             ),
             false
         );

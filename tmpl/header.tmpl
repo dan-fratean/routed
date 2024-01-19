@@ -1,5 +1,29 @@
+<!-- header.tmpl -->
 <html>
 	<head>
+		<script type="text/javascript">
+			window.addEventListener("load", function(){
+				Array.from(document.querySelectorAll('[tip]')).forEach(el => {
+				  let tip = document.createElement('div');
+				  tip.classList.add('tooltip');
+				  tip.innerText = el.getAttribute('tip');
+				  let delay = el.getAttribute('tip-delay');
+				  if (delay) {
+				    tip.style.transitionDelay = delay + 's';
+				  }
+				  tip.style.transform =
+				    'translate(' +
+				      (el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '15px') + ', ' +
+				      (el.hasAttribute('tip-top') ? '-100%' : '0') +
+				    ')';
+				  el.appendChild(tip);
+				  el.onmousemove = e => {
+				    tip.style.left = e.clientX + 'px'
+				    tip.style.top = e.clientY + 'px';
+				  };
+				});
+			});
+		</script>
 		<style>
 			body {
 				margin: 0;
@@ -57,6 +81,25 @@
 			#system_list >div {
 				width: 150px;
 				flex-shrink: 0;
+			}
+
+			[tip] .tooltip {
+				position: fixed;
+				font-size: 1em;
+				line-height: 1.2em;
+				padding: .3em;
+				background: white;
+				border: 1px solid #ccc;
+				visibility: hidden;
+				box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
+				opacity: 0;
+				transition:
+					opacity 0.3s,
+					visiblity 0s;
+			}
+			[tip]:hover .tooltip {
+				visibility: visible;
+				opacity: 1;
 			}
 		</style>
 		<title>EVE Online - Routed</title>
