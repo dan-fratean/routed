@@ -78,17 +78,40 @@ function parse_data($input)
         switch ($group) {
             case 'bes':
                 $css = 'group_besieged';
+                $img = 'combatSite_16.png';
+                break;
+            case 'cmb':
+                $css = 'group_combat';
+                $img = 'combatSite_16.png';
                 break;
             case 'gas':
                 $css = 'group_gas';
+                $img = 'harvestableCloud.png';
                 break;
             case 'wrh':
                 $css = 'group_wormhole';
+                $img = 'wormhole.png';
+                break;
+            case 'ore':
+                $css = '';
+                $img = 'ore_Site_16.png';
+                break;
+            case 'dat':
+                $css = '';
+                $img = 'data_Site_16.png';
+                break;
+            case 'rel':
+                $css = '';
+                $img = 'relic_Site_16.png';
                 break;
             default:
                 $css = '';
+                $img = 'unk.png';
                 break;
         }
+        $image_colour = 'green';
+        if ($data[4] != '100.0%')
+            $image_colour = 'red';
 
         $details =  'Type:&nbsp;&nbsp;&nbsp;'.$data[1]."\n";
         $details .= 'Group:&nbsp;&nbsp;'.$data[2]."\n";
@@ -104,6 +127,8 @@ function parse_data($input)
             '{{SIG_SCAN_AGE}}' => ($diff->format('%H:%I:%S')),
             '{{SIG_GROUP_CLASS}}' => $css,
             '{{SIG_DETAILS}}' => $details,
+            '{{SIG_IMG}}' => $img,
+            '{{SIG_IMG_COLOUR}}' => $image_colour,
             ),
             false
         );

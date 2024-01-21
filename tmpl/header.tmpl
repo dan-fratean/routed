@@ -23,7 +23,27 @@
 				  };
 				});
 			});
+			function systenNameClicked(elem) {
+				console.log(document.getElementById('add_system_name'));
+				document.getElementById('add_system_name').value = elem.getAttribute('data-system-name');
+			};
 		</script>
+		<svg height="0" width="0" style="visibility:none">
+			<filter id="green" color-interpolation-filters="sRGB" x="0" y="0" height="100%" width="100%">
+				<feColorMatrix type="matrix"
+					values="0   0 0 0 0 
+						0.8 0 0 0 0	
+						0   0 0 0 0 
+						0   0 0 1 0" />
+			</filter>
+			<filter id="red" color-interpolation-filters="sRGB" x="0" y="0" height="100%" width="100%">
+				<feColorMatrix type="matrix"
+					values="1 0 0 0 0 
+						0 0 0 0 0	
+						0 0 0 0 0 
+						0 0 0 1 0" />
+			</filter>
+		</svg>
 		<style>
 			body {
 				margin: 0;
@@ -39,7 +59,7 @@
 				position: absolute;
 				left: 0; right: 0; top: 0; bottom: 0;
 				z-index: -1;
-				opacity: 0.3;
+				opacity: 0.4;
 			}
 
 			.container {
@@ -55,12 +75,16 @@
 			}
 
 			.group_besieged {
-				color: #990000;
+				color: #FF0099;
 				font-weight: bold;
 			}
 
+			.group_combat {
+				color: #440000;
+			}
+
 			.group_gas {
-				color: #009900;
+				color: #99FF00;
 				font-weight: bold;
 			}
 
@@ -78,8 +102,31 @@
 				display:flex
 			}
 
+			.sig_details {
+				background: rgba(255, 255, 255, 0.2);
+				padding: .2em .3em .2em .3em;
+				margin: .1em;
+				display: flex;
+				align-items:center;
+			}
+
+			.sig_icon {
+				width: 1em;
+				height: 1em;
+				padding-right: .3em;
+				mix-blend-mode: normal;
+				z-index:999;
+			}
+			.sig_icon_green {
+				filter: url(#green);
+
+			}
+			.sig_icon_red {
+				filter: url(#red);
+			}
+
 			#system_list >div {
-				width: 150px;
+				width: 13.7em;
 				flex-shrink: 0;
 			}
 
@@ -100,9 +147,10 @@
 			[tip]:hover .tooltip {
 				visibility: visible;
 				opacity: 1;
+				z-index: 1000;
 			}
 		</style>
-		<title>EVE Online - Routed</title>
+		<title>path-o-logical</title>
 	</head>
 	<body>
 		<div class="container">

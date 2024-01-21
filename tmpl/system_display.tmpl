@@ -8,7 +8,7 @@
 									<td class="system_name">
 										<b>
 											<center>
-												{{SYSTEM_NAME}}
+<span id="system_name" data-system-name="{{SYSTEM_NAME}}" onclick="systenNameClicked(this)">{{SYSTEM_NAME}}</span>
 											</center>
 										</b>
 									</td>
@@ -20,7 +20,6 @@
 								</tr>
 								<tr>
 									<td>
-										<hr>
 										<center>
 											<input type="submit" value="Remove" onclick="return confirm('Are you sure?');"/>
 										</center>
