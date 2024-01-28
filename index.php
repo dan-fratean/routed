@@ -150,14 +150,18 @@ function parse_data($input)
 
 function parse_sig_form_data($raw_sig_data)
 {
-        $new_data = array();
-
-        $__tmp = explode("\n", $raw_sig_data);
+    $new_data = array();
+    
+    $__tmp = explode("\n", $raw_sig_data);
     foreach ($__tmp as $line) {
         $_tmp = explode("\t", $line);
 
         $id = trim($_tmp[0]);
         if (empty($id)) {
+            continue;
+        }
+
+        if (sizeof($_tmp) != 6) {
             continue;
         }
 
