@@ -30,13 +30,16 @@ function display_template($template, $data = array(), $display = true)
 }
 
 //display functions
-function display_system($id, $data)
+function display_system($id, $data, $highlight = false)
 {
+    $highlight = ($highlight?'system_highlight':'');
+
     display_template(
         'system_display',
         array(
-        '{{SYSTEM_NAME}}' => ucwords($id),
-        '{{SYSTEM_SIGS}}' => $data
+            '{{SYSTEM_NAME}}' => ucwords($id),
+            '{{SYSTEM_SIGS}}' => $data,
+            '{{SYSTEM_HIGHLIGHT}}' => $highlight,
         )
     );
 }
@@ -85,6 +88,7 @@ function parse_data($input)
             $group = 'bes';
         }
 
+        $sig_highlight = '';
         switch ($group) {
             case 'bes':
                 $css = 'group_besieged';
@@ -117,8 +121,10 @@ function parse_data($input)
             default:
                 $css = '';
                 $img = '38_16_111.png';
+                $sig_highlight = 'sig_highlight';
                 break;
         }
+
         $image_colour = 'green';
         if ($data[4] != '100.0%') {
             $image_colour = 'red';
@@ -133,13 +139,14 @@ function parse_data($input)
         $result .= display_template(
             'system_row',
             array(
-            '{{SIG_ID}}' => $id,
-            '{{SIG_GROUP}}' => $group,
-            '{{SIG_SCAN_AGE}}' => ($diff->format('%H:%I:%S')),
-            '{{SIG_GROUP_CLASS}}' => $css,
-            '{{SIG_DETAILS}}' => $details,
-            '{{SIG_IMG}}' => $img,
-            '{{SIG_IMG_COLOUR}}' => $image_colour,
+                '{{SIG_ID}}' => $id,
+                '{{SIG_GROUP}}' => $group,
+                '{{SIG_SCAN_AGE}}' => ($diff->format('%H:%I:%S')),
+                '{{SIG_GROUP_CLASS}}' => $css,
+                '{{SIG_DETAILS}}' => $details,
+                '{{SIG_IMG}}' => $img,
+                '{{SIG_IMG_COLOUR}}' => $image_colour,
+                '{{SIG_HIGHLIGHT}}' => $sig_highlight,
             ),
             false
         );
@@ -204,6 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
+$no_data_alert = false;
 if (!empty($post_data)) {
     $parsed_sig_data = parse_sig_form_data($post_data[1]['raw_data']);
     if (empty($post_data[0])) {//lets try auto locate system based on saved sigs
@@ -249,7 +257,7 @@ if (!empty($post_data)) {
         $data[$post_data[0]]['raw_data'] = $new_data;
         $data[$post_data[0]]['display'] = true;
     } else {
-        display_alert('No system automatically matched!');
+        $no_data_alert = true;
     }
 }
 
@@ -260,10 +268,14 @@ display_template('system_list_before');
 ksort($data);
 foreach ($data as $id => $system_data) {
     if ($system_data['display']) {
-        display_system($id, parse_data($system_data['raw_data']));
+        display_system($id, parse_data($system_data['raw_data']), ($id == $post_data[0]));
     }
 }
 display_template('system_list_after');
 display_template('separator');
 display_add_form();
 display_template('footer');
+
+if ($no_data_alert) {
+    display_alert('No system automatically matched!');
+}

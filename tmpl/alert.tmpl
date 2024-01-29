@@ -1,3 +1,9 @@
 <script>
-  alert("{{ALERT}}");
+  var prev_handler = window.onload;
+  window.onload = function () {
+    if (prev_handler) {
+      prev_handler();
+    }
+    alert("{{ALERT}}");
+  };
 </script>
