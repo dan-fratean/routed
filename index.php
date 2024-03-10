@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/vendor/autoload.php');
+
 define('SAVE_FILE', 'save.json');
 
 //db functions
@@ -88,6 +90,10 @@ function parse_data($input)
             $group = 'bes';
         }
 
+        if (strpos($data[3], 'Ice') !== false) {
+            $group = 'ice';
+        }
+
         $sig_highlight = '';
         switch ($group) {
             case 'bes':
@@ -107,7 +113,11 @@ function parse_data($input)
                 $img = 'wormhole.png';
                 break;
             case 'ore':
-                $css = '';
+                $css = 'group_ore';
+                $img = 'ore_Site_16.png';
+                break;
+            case 'ice':
+                $css = 'group_ice';
                 $img = 'ore_Site_16.png';
                 break;
             case 'dat':
@@ -141,7 +151,7 @@ function parse_data($input)
             array(
                 '{{SIG_ID}}' => $id,
                 '{{SIG_GROUP}}' => $group,
-                '{{SIG_SCAN_AGE}}' => ($diff->format('%H:%I:%S')),
+                '{{SIG_SCAN_AGE}}' => ($diff->format('%dd %hh %Im')),
                 '{{SIG_GROUP_CLASS}}' => $css,
                 '{{SIG_DETAILS}}' => $details,
                 '{{SIG_IMG}}' => $img,
@@ -184,11 +194,26 @@ function parse_sig_form_data($raw_sig_data)
         return $new_data;
 }
 
+function expire_data($data, $delta = 3 * 86400) {
+    foreach($data as $system => $system_data) {
+        foreach($system_data['raw_data'] as $sig_id => $raw_data) {
+            if ($raw_data[5] + $delta < time()) {
+                unset($data[$system]['raw_data'][$sig_id]);
+            }
+        }
+        if (empty($data[$system]['raw_data'])) {
+            unset($data[$system]);
+        }
+    }
+    return $data;
+}
+
 //read data from db :D
 $data = read_data();
 if (!$data) {
     $data = array();
 }
+
 
 //parse requests
 $post_data = array();
@@ -208,6 +233,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($_POST['action'] === 'remove') {
         $system_name = strtolower(htmlspecialchars($_POST['system_name']));
         $data[$system_name]['display'] = false;
+        $data = expire_data($data);
+        write_data($data);
+    }
+
+    //reset hightlight
+    foreach ($data as $id => $system_data) {
+        $data[$id]["highlight"] = false;
     }
 }
 
@@ -227,6 +259,49 @@ if (!empty($post_data)) {
     }
 
     if (!empty($post_data[0])) {
+/*
+        if (empty($data[$post_data[0]]['system_info'])) {
+            $apiInstance = new Swagger\Client\Eve\Api\UniverseApi();
+            $system_id = 0;
+
+            $names = array($post_data[0]);
+            $accept_language = 'en';
+            $datasource = 'tranquility';
+            $language = 'en';
+
+            try {
+                $result = $apiInstance->postUniverseIds($names, $accept_language, $datasource, $language);
+                $system_id = $result['systems'][0]['id'];
+            } 
+            catch (Exception $e) {
+                error_log('Exception when calling UniverseApi->postUniverseIds: '.$e->getMessage());
+            }
+            
+            $system_security_status = "?";
+            $system_kills = "?";
+            if ($system_id) {
+                try {
+                    $result = $apiInstance->getUniverseSystemsSystemId($system_id, $accept_language, $datasource, $language);
+                    $security_status = $result['security_status'];
+                } 
+                catch (Exception $e) {
+                    error_log('Exception when calling UniverseApi->getUniverseSystemsSystemId: '.$e->getMessage());
+                }
+
+                try {
+                    $result = $apiInstance->getUniverseSystemKills($datasource, bin2hex(random_bytes(18)));
+                    $parsed_system_kills = array();
+                    foreach($result as $result_row)
+                        $parsed_system_kills[$result_row['system_id']] = $result_row;
+                    print_r($parsed_system_kills);
+                } 
+                catch (Exception $e) {
+                    error_log('Exception when calling UniverseApi->getUniverseSystemsSystemId: '.$e->getMessage());
+                }
+            }
+        }
+*/
+
         $new_data = array();
         
         if (!empty($data[$post_data[0]])) {
@@ -256,19 +331,25 @@ if (!empty($post_data)) {
 
         $data[$post_data[0]]['raw_data'] = $new_data;
         $data[$post_data[0]]['display'] = true;
+        $data[$post_data[0]]['highlight'] = true;
+
+        $data = expire_data($data);
+        write_data($data);
+
+        header('Location: /eve/routed/');
+        die();
     } else {
         $no_data_alert = true;
     }
 }
 
-write_data($data);
 
 display_template('header');
 display_template('system_list_before');
 ksort($data);
 foreach ($data as $id => $system_data) {
     if ($system_data['display']) {
-        display_system($id, parse_data($system_data['raw_data']), ($id == $post_data[0]));
+        display_system($id, parse_data($system_data['raw_data']), $system_data['highlight']);
     }
 }
 display_template('system_list_after');

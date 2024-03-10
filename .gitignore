@@ -3,3 +3,5 @@ save.json
 phpcs.phar
 phpcbf.phar
 DEADJOE
+composer.phar
+vendor/*
